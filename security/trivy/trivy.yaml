@@ -1,0 +1,11 @@
+scan:
+  security-checks:
+    - vuln
+    - config
+    - secret
+  severity:
+    - CRITICAL
+    - HIGH
+
+misconfigurations:
+  include-non-failures: false

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: platform-api-netpol
+  namespace: platform
+spec:
+  podSelector:
+    matchLabels:
+      app: platform-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Dozvoli promet iz istog namespace-a (npr. monitoring/port-forward scenario ne treba, ali internal calls da)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: platform
+  egress:
+    # Dozvoli DNS (CoreDNS) i sve egress (jednostavno za demo). Ako želiš strože, možemo suziti.
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - {}

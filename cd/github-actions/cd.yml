@@ -1,0 +1,45 @@
+name: CD
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "app/**"
+      - "k8s/**"
+      - "security/**"
+      - "cd/**"
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+
+      - name: Configure kubeconfig (from secret)
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG_B64}" | base64 -d > ~/.kube/config
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+
+      - name: Apply security policies
+        run: |
+          kubectl apply -k security/policies
+
+      - name: Deploy app (dev)
+        run: |
+          kubectl apply -k k8s/overlays/dev
+
+      - name: Verify
+        run: |
+          kubectl get ns
+          kubectl get pods -n platform
+          kubectl get svc -n platform

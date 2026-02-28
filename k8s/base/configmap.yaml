@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-api-config
+  namespace: platform
+data:
+  APP_ENV: "dev"
+  APP_NAME: "platform-api"
+  LOG_LEVEL: "INFO"
